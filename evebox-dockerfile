@@ -1,0 +1,15 @@
+FROM ubuntu:latest
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y nano wget gnupg apt-transport-https
+RUN wget -qO - https://evebox.org/files/GPG-KEY-evebox | apt-key add -
+RUN echo "deb http://evebox.org/files/debian stable main" | tee /etc/apt/sources.list.d/evebox.list
+RUN apt-get update && apt-get install -y evebox
+
+RUN cat > /etc/run.sh <<'EOF'
+#!/bin/bash
+evebox server --no-auth --no-tls -c /etc/evebox/evebox.yaml -v --host 0.0.0.0 -D /etc/evebox/ --datastore sqlite --input /var/log/suricata/eve.json
+EOF
+RUN chmod +x /etc/run.sh
+
+ENTRYPOINT ["/etc/run.sh"]
