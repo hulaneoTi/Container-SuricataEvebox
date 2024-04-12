@@ -1,0 +1,28 @@
+services:
+  suricata:
+    container_name: suricata
+    image: suricata
+    build:
+      dockerfile: suricata-dockerfile
+    network_mode: host
+    cap_add:
+      - net_admin
+      - net_raw
+      - sys_nice
+    volumes:
+      - ./rules:/var/lib/suricata/rules
+      - ./logs:/var/log/suricata
+    env_file:
+      - .env
+  evebox:
+    container_name: evebox
+    image: evebox
+    build:
+      dockerfile: evebox-dockerfile
+    volumes:
+      - ./logs:/var/log/suricata
+    ports:
+      - "5636:5636"
+    env_file:
+      - .env
+networks: {}
